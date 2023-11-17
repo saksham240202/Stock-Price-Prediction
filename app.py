@@ -54,7 +54,7 @@ fig_ma200.add_scatter(x=data.index, y=data[column], mode='lines', name=column, l
 fig_ma200.update_layout(width=900, height=400)  # Set width and height
 st.plotly_chart(fig_ma200)
 #ADF test Check Stationarity
-st.header('Is data Stationary?',help='If p<=0.05 then data is stationary')
+st.header('Is data Stationary?')
 st.write(adfuller(data[column])[1]<0.05)
 
 decomposition=seasonal_decompose(data[column],model='additive',period=12)
