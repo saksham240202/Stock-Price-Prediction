@@ -34,7 +34,7 @@ data = data.reset_index()
 st.write(start_date,"to",end_date)
 st.write(data)
 
-st.subheader("Plot the data",help='Select a Column and Zoom in')
+st.subheader("Plot the data")
 fig=px.line(data, x='Date',y=data.columns,width=1000, height=600)
 st.plotly_chart(fig)
 
