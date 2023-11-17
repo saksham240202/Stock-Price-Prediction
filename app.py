@@ -17,7 +17,8 @@ from sklearn.preprocessing import MinMaxScaler
 from keras.models import Sequential
 from keras.layers import LSTM, Dense, SimpleRNN
 
-st.title('Data Visualization',help='This app is created to forcast the stock market price of a selected stock')
+st.title('Data Visualization')
+st.text('This app is created to forecast the stock market price of a selected stock.')
 
 #INPUT Start and End date
 st.sidebar.header('User Input')
