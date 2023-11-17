@@ -1,4 +1,3 @@
-unixodbc-dev
 click<=8.0.4
 tensorflow>=2.0.0
 keras>=2.8.0
