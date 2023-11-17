@@ -1,6 +1,7 @@
 click<=8.0.4
 streamlit==1.14.1
 tensorflow==2.10.0
+protobuf<3.20,>=3.9.2
 keras==2.10.0
 matplotlib==3.8.0
 numpy==1.25.2
