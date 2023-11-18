@@ -17,8 +17,7 @@ from sklearn.preprocessing import MinMaxScaler
 from keras.models import Sequential
 from keras.layers import LSTM, Dense, SimpleRNN
 
-st.title('Data Visualization')
-st.text('This app is created to forecast the stock market price of a selected stock.')
+st.title('Data Visualization',help='This app is created to forcast the stock market price of a selected stock')
 
 #INPUT Start and End date
 st.sidebar.header('User Input')
@@ -34,8 +33,8 @@ data = data.reset_index()
 st.write(start_date,"to",end_date)
 st.write(data)
 
-st.subheader("Plot the data")
-fig=px.line(data, x='Date',y=data.columns,width=1500, height=600)
+st.subheader("Plot the data",help='Select a Column and Zoom in')
+fig=px.line(data, x='Date',y=data.columns,width=1000, height=600)
 st.plotly_chart(fig)
 
 column=st.selectbox('Select the column',data.columns[1:])
@@ -54,7 +53,7 @@ fig_ma200.add_scatter(x=data.index, y=data[column], mode='lines', name=column, l
 fig_ma200.update_layout(width=900, height=400)  # Set width and height
 st.plotly_chart(fig_ma200)
 #ADF test Check Stationarity
-st.header('Is data Stationary?')
+st.header('Is data Stationary?',help='If p<=0.05 then data is stationary')
 st.write(adfuller(data[column])[1]<0.05)
 
 decomposition=seasonal_decompose(data[column],model='additive',period=12)
