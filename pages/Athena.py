@@ -3,12 +3,16 @@ import pandas as pd
 from pyathena import connect
 
 # AWS Athena connection parameters
+aws_access_key_id = st.secrets("aws_access_key_id")
+aws_secret_access_key = st.secrets("aws_secret_access_key")
 region_name = 'ap-south-1'
 database = 'stock_market'
 table = 'kafka_stock_market_using_aws_ms_csv'
 
 # Establish connection to Athena
 conn = connect(
+    aws_access_key_id=aws_access_key_id,
+    aws_secret_access_key=aws_secret_access_key,
     region_name=region_name,
     s3_staging_dir='s3://athena-stock-market-kafka-ms/',
     schema_name=database,
