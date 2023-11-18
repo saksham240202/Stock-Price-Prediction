@@ -9,8 +9,6 @@ table = 'kafka_stock_market_using_aws_ms_csv'
 
 # Establish connection to Athena
 conn = connect(
-    aws_access_key_id=aws_access_key_id,
-    aws_secret_access_key=aws_secret_access_key,
     region_name=region_name,
     s3_staging_dir='s3://athena-stock-market-kafka-ms/',
     schema_name=database,
