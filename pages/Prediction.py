@@ -18,7 +18,7 @@ from keras.models import Sequential
 from keras.layers import LSTM, Dense, SimpleRNN
 
 
-st.title('Stock Market Prediction', help='This app is created to forecast the stock market price of a selected stock')
+st.title('Stock Market Prediction')
 
 # INPUT Start and End date
 st.sidebar.header('User Input')
