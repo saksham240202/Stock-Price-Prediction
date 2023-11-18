@@ -35,7 +35,7 @@ st.write(start_date,"to",end_date)
 st.write(data)
 
 st.subheader("Plot the data")
-fig=px.line(data, x='Date',y=data.columns,width=1000, height=600)
+fig=px.line(data, x='Date',y=data.columns,width=1500, height=600)
 st.plotly_chart(fig)
 
 column=st.selectbox('Select the column',data.columns[1:])
