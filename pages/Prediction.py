@@ -81,7 +81,7 @@ def Sarima():
     fig.update_layout(title='Actual vs Predicted', xaxis_title='Date', yaxis_title='Price', width=1000, height=400)
 
     # Display the Plot
-    st.plotly_chart(fig)
+    st.plotly_chart(fig, use_container_width=True, className='st-sc')
 
 
 def Random_Forest():
@@ -90,7 +90,7 @@ def Random_Forest():
     data['month'] = data['Date'].dt.month
     data['year'] = data['Date'].dt.year
 
-    # User input for number of days to predict
+    # User input 
     days = st.number_input("Enter the number of days to predict", min_value=30, step=1)
 
     # Creating feature set and target variable
@@ -123,7 +123,8 @@ def Random_Forest():
         go.Scatter(x=future_dates['Date'], y=future_dates[column], mode='lines', name='Forecast', line=dict(color='orange')))
 
     fig.update_layout(title='AAPL Stock Price Forecast', xaxis_title='Date', yaxis_title='Stock Price')
-    st.plotly_chart(fig)
+    st.plotly_chart(fig, use_container_width=True, className='st-sc')
+
 
 
 def FbProphet():
@@ -150,7 +151,8 @@ def FbProphet():
     fig.add_trace(go.Scatter(x=forecast['ds'], y=forecast['yhat'], mode='lines', name='Forecast', line=dict(color='orange')))
 
     fig.update_layout(xaxis_title='Date', yaxis_title='Stock Price')
-    st.plotly_chart(fig)
+    st.plotly_chart(fig, use_container_width=True, className='st-sc')
+
 
 
 def LSTM_Model():
@@ -224,7 +226,8 @@ def LSTM_Model():
     fig.add_trace(go.Scatter(x=valid['Date'], y=valid['Predictions'], mode='lines', name='Predictions'))
 
     fig.update_layout(title='LSTM Model - Stock Price Prediction', xaxis_title='Date', yaxis_title='Stock Price')
-    st.plotly_chart(fig)
+    st.plotly_chart(fig, use_container_width=True, className='st-sc')
+
 
     current_date = datetime.date.today()
     future_date_range = pd.date_range(start=current_date, periods=30)
@@ -251,7 +254,8 @@ def LSTM_Model():
 
     fig.update_layout(title='LSTM Model - Stock Price Prediction for Next 30 Days',
                       xaxis_title='Date', yaxis_title='Stock Price')
-    st.plotly_chart(fig)
+    st.plotly_chart(fig, use_container_width=True, className='st-sc')
+
 
 def RNN_Model():
     # Normalize the data
@@ -322,7 +326,8 @@ def RNN_Model():
     fig.add_trace(go.Scatter(x=valid['Date'], y=valid['Predictions'], mode='lines', name='Predictions'))
 
     fig.update_layout(title='RNN Model - Stock Price Prediction', xaxis_title='Date', yaxis_title='Stock Price')
-    st.plotly_chart(fig)
+    st.plotly_chart(fig, use_container_width=True, className='st-sc')
+
  # Get today's date and define the future date range for prediction
     current_date = datetime.date.today()
     future_date_range = pd.date_range(start=current_date, periods=30)
@@ -349,17 +354,55 @@ def RNN_Model():
 
     fig.update_layout(title='RNN Model - Stock Price Prediction for Next 30 Days',
                       xaxis_title='Date', yaxis_title='Stock Price')
-    st.plotly_chart(fig)
+    st.plotly_chart(fig, use_container_width=True, className='st-sc')
+
 
 choice = st.sidebar.selectbox('Select Model', ['Random Forest', 'Fb Prophet', 'Sarima', 'LSTM', 'RNN'])
 
 if choice == 'Random Forest':
+    st.write("<div class='full-width'>", unsafe_allow_html=True)
     Random_Forest()
+    st.write("</div>", unsafe_allow_html=True)
 elif choice == 'Fb Prophet':
+    st.write("<div class='full-width'>", unsafe_allow_html=True)
     FbProphet()
+    st.write("</div>", unsafe_allow_html=True)
 elif choice == 'Sarima':
+    st.write("<div class='full-width'>", unsafe_allow_html=True)
     Sarima()
+    st.write("</div>", unsafe_allow_html=True)
 elif choice == 'LSTM':
+    st.write("<div class='full-width'>", unsafe_allow_html=True)
     LSTM_Model()
+    st.write("</div>", unsafe_allow_html=True)
 elif choice == 'RNN':
+    st.write("<div class='full-width'>", unsafe_allow_html=True)
     RNN_Model()
+    st.write("</div>", unsafe_allow_html=True)
+
+# Use CSS for responsiveness
+st.markdown(
+    """
+    <style>
+        /* CSS for responsiveness */
+        .full-width {
+            width: 100%;
+            max-width: 100%;
+        }
+        .st-iframe {
+            width: 100%;
+            max-width: 100%;
+        }
+        .st-df {
+            width: 100%;
+            max-width: 100%;
+        }
+        .st-sc {
+            width: 100%;
+            max-width: 100%;
+        }
+        /* Add more classes for other elements if needed */
+    </style>
+    """,
+    unsafe_allow_html=True
+)
