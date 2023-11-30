@@ -48,13 +48,9 @@ def Sarima():
     model = sm.tsa.statespace.SARIMAX(data[column], order=(p, d, q), seasonal_order=(p, d, q, seasonal_order))
     model = model.fit()
 
-    st.write("Model Summary")
-    st.write(model.summary())
-    st.write("---")
-
     # Predict the values
     st.write("<p style= 'color:green; font-size:50px; ,font-weight:bold;'>Forcasting the data</p>", unsafe_allow_html=True)
-    forecast_period = st.number_input("Select the number of days to forecast", 1, 365, 10)
+    forecast_period = st.number_input("Select the number of days to forecast", 1, 365, 30)
     predictions = model.get_prediction(start=len(data), end=len(data) + forecast_period)
     predictions = predictions.predicted_mean
 
@@ -63,18 +59,16 @@ def Sarima():
     predictions = pd.DataFrame(predictions)
     predictions.insert(0, 'Date', predictions.index)
     predictions.reset_index(drop=True, inplace=True)
-    st.write("## Preditions", predictions)
-    st.write("## Actual Data", data)
 
     # Lets Plot the data
     fig = go.Figure()
 
     # Add acutal data to the Plot
-    fig.add_trace(go.Scatter(x=data["Date"], y=data[column], mode='lines', name='Actual', line=dict(color='blue')))
+    fig.add_trace(go.Scatter(x=data["Date"], y=data[column], mode='lines', name='Historical Data', line=dict(color='blue')))
 
     # Add prediction data to the plot
     fig.add_trace(
-        go.Scatter(x=predictions['Date'], y=predictions['predicted_mean'], mode='lines', name='Predicted',
+        go.Scatter(x=predictions['Date'], y=predictions['predicted_mean'], mode='lines', name='Forecast',
                    line=dict(color='red')))
 
     # Set the title and axis labels
@@ -92,12 +86,10 @@ def Random_Forest():
 
     # User input 
     days = st.number_input("Enter the number of days to predict", min_value=30, step=1)
-
-    # Creating feature set and target variable
     X = data[['day_of_week', 'day_of_month', 'month', 'year']]
     y = data[column]
 
-    # Fitting the Random Forest model
+    # Model Fitting
     model = RandomForestRegressor(n_estimators=100, random_state=42)
     model.fit(X, y)
 
@@ -113,8 +105,10 @@ def Random_Forest():
     })
 
     forecast = model.predict(future_features)
-
-    # Plotting historical and forecasted data using Plotly
+    
+    rmse = np.sqrt(np.mean((forecast - data[column][-days:]) ** 2))
+    st.write(f'Root Mean Squared Error (RMSE): {rmse}')
+    # Plotting historical and forecasted data
     fig = go.Figure()
     fig.add_trace(go.Scatter(x=data['Date'], y=data[column], mode='lines', name='Historical Data'))
 
@@ -122,7 +116,7 @@ def Random_Forest():
     fig.add_trace(
         go.Scatter(x=future_dates['Date'], y=future_dates[column], mode='lines', name='Forecast', line=dict(color='orange')))
 
-    fig.update_layout(title='AAPL Stock Price Forecast', xaxis_title='Date', yaxis_title='Stock Price')
+    fig.update_layout(xaxis_title='Date', yaxis_title='Price')
     st.plotly_chart(fig, use_container_width=True, className='st-sc')
 
 
@@ -131,7 +125,6 @@ def FbProphet():
     data1 = data[['Date', column]]
     data1 = data.rename(columns={'Date': 'ds', column: 'y'})
 
-    # User input for number of days to predict using Streamlit
     days = st.number_input("Enter the number of days to predict", min_value=1, step=1, value=30)
 
     # Fitting the model
@@ -143,8 +136,10 @@ def FbProphet():
 
     # Predicting the future
     forecast = model.predict(future)
+    rmse = np.sqrt(np.mean((forecast['yhat'].tail(days).values - data[column].tail(days).values) ** 2))
+    st.write(f'Root Mean Squared Error (RMSE): {rmse}')
 
-    # Plotting historical and forecasted data using Plotly
+    # Plotting historical and forecasted data 
     fig = go.Figure()
     fig.add_trace(go.Scatter(x=data1['ds'], y=data1['y'], mode='lines', name='Historical Data'))
 
@@ -157,6 +152,8 @@ def FbProphet():
 
 def LSTM_Model():
     # Normalize the data
+    
+    days = st.number_input("Enter the number of days to predict", min_value=1, step=1, value=30)
     scaler = MinMaxScaler(feature_range=(0, 1))
     scaled_data = scaler.fit_transform(data[column].values.reshape(-1, 1))
 
@@ -164,8 +161,6 @@ def LSTM_Model():
     training_data_len = int(np.ceil(len(scaled_data) * .95))
 
     train_data = scaled_data[0:int(training_data_len), :]
-
-    # Create the training data
     x_train, y_train = [], []
 
     for i in range(60, len(train_data)):
@@ -225,18 +220,17 @@ def LSTM_Model():
     fig.add_trace(go.Scatter(x=valid['Date'], y=valid[column], mode='lines', name='Validation'))
     fig.add_trace(go.Scatter(x=valid['Date'], y=valid['Predictions'], mode='lines', name='Predictions'))
 
-    fig.update_layout(title='LSTM Model - Stock Price Prediction', xaxis_title='Date', yaxis_title='Stock Price')
+    fig.update_layout(title='LSTM Model', xaxis_title='Date', yaxis_title='Price')
     st.plotly_chart(fig, use_container_width=True, className='st-sc')
 
-
     current_date = datetime.date.today()
-    future_date_range = pd.date_range(start=current_date, periods=30)
+    future_date_range = pd.date_range(start=current_date, periods=days)
 
     # Create the future data for prediction
     future_data = scaled_data[-60:]  # Use the last 60 days as input for prediction
 
     future_predictions = []
-    for i in range(30):
+    for i in range(days):
         future_input = np.reshape(future_data, (1, future_data.shape[0], 1))  # Reshape for prediction
         future_output = model.predict(future_input)
         future_data = np.append(future_data, future_output, axis=0)
@@ -245,29 +239,27 @@ def LSTM_Model():
     future_predictions = scaler.inverse_transform(np.array(future_predictions).reshape(-1, 1))
 
     # Prepare future dates for plotting
-    future_dates = pd.date_range(start=current_date + timedelta(days=1), periods=30)
+    future_dates = pd.date_range(start=current_date + timedelta(days=1), periods=days)
 
     # Plot the predictions
     fig = go.Figure()
     fig.add_trace(go.Scatter(x=data['Date'], y=data[column], mode='lines', name='Historical Data'))
-    fig.add_trace(go.Scatter(x=future_dates, y=future_predictions.flatten(), mode='lines', name='Predictions'))
+    fig.add_trace(go.Scatter(x=future_dates, y=future_predictions.flatten(), mode='lines', name='Forecast'))
 
-    fig.update_layout(title='LSTM Model - Stock Price Prediction for Next 30 Days',
-                      xaxis_title='Date', yaxis_title='Stock Price')
+    fig.update_layout(xaxis_title='Date', yaxis_title='Price')
     st.plotly_chart(fig, use_container_width=True, className='st-sc')
 
 
 def RNN_Model():
     # Normalize the data
+    
+    days = st.number_input("Enter the number of days to predict", min_value=1, step=1, value=30)
     scaler = MinMaxScaler(feature_range=(0, 1))
     scaled_data = scaler.fit_transform(data[column].values.reshape(-1, 1))
 
     # Create training data
     training_data_len = int(np.ceil(len(scaled_data) * .95))
-
     train_data = scaled_data[0:int(training_data_len), :]
-
-    # Create the training data
     x_train, y_train = [], []
 
     for i in range(60, len(train_data)):
@@ -325,18 +317,18 @@ def RNN_Model():
     fig.add_trace(go.Scatter(x=valid['Date'], y=valid[column], mode='lines', name='Validation'))
     fig.add_trace(go.Scatter(x=valid['Date'], y=valid['Predictions'], mode='lines', name='Predictions'))
 
-    fig.update_layout(title='RNN Model - Stock Price Prediction', xaxis_title='Date', yaxis_title='Stock Price')
+    fig.update_layout(title='RNN Model', xaxis_title='Date', yaxis_title='Price')
     st.plotly_chart(fig, use_container_width=True, className='st-sc')
 
  # Get today's date and define the future date range for prediction
     current_date = datetime.date.today()
-    future_date_range = pd.date_range(start=current_date, periods=30)
+    future_date_range = pd.date_range(start=current_date, periods=days)
 
     # Create the future data for prediction
     future_data = scaled_data[-60:]  # Use the last 60 days as input for prediction
 
     future_predictions = []
-    for i in range(30):
+    for i in range(days):
         future_input = np.reshape(future_data, (1, future_data.shape[0], 1))  # Reshape for prediction
         future_output = model.predict(future_input)
         future_data = np.append(future_data, future_output, axis=0)
@@ -345,15 +337,14 @@ def RNN_Model():
     future_predictions = scaler.inverse_transform(np.array(future_predictions).reshape(-1, 1))
 
     # Prepare future dates for plotting
-    future_dates = pd.date_range(start=current_date + timedelta(days=1), periods=30)
+    future_dates = pd.date_range(start=current_date + timedelta(days=1), periods=days)
 
     # Plot the predictions
     fig = go.Figure()
     fig.add_trace(go.Scatter(x=data['Date'], y=data[column], mode='lines', name='Historical Data'))
-    fig.add_trace(go.Scatter(x=future_dates, y=future_predictions.flatten(), mode='lines', name='Predictions'))
+    fig.add_trace(go.Scatter(x=future_dates, y=future_predictions.flatten(), mode='lines', name='Forecast'))
 
-    fig.update_layout(title='RNN Model - Stock Price Prediction for Next 30 Days',
-                      xaxis_title='Date', yaxis_title='Stock Price')
+    fig.update_layout(xaxis_title='Date', yaxis_title='Price')                      
     st.plotly_chart(fig, use_container_width=True, className='st-sc')
 
 
@@ -380,11 +371,10 @@ elif choice == 'RNN':
     RNN_Model()
     st.write("</div>", unsafe_allow_html=True)
 
-# Use CSS for responsiveness
+# CSS for responsiveness
 st.markdown(
     """
     <style>
-        /* CSS for responsiveness */
         .full-width {
             width: 100%;
             max-width: 100%;
@@ -401,7 +391,6 @@ st.markdown(
             width: 100%;
             max-width: 100%;
         }
-        /* Add more classes for other elements if needed */
     </style>
     """,
     unsafe_allow_html=True

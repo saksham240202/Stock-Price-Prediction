@@ -60,11 +60,10 @@ st.plotly_chart(px.line(x=data["Date"], y=decomposition.resid, title='Residuals'
                         labels={'x': 'Date', 'y': 'Price'}).update_traces(line_color='Red'),
                 use_container_width=True, className='stPlotlyChart')
 
-# Use CSS for responsiveness
+# CSS for responsiveness
 st.markdown(
     """
     <style>
-        /* CSS for responsiveness */
         .stPlotlyChart {
             max-width: 100%;
             width: 100%;
