@@ -59,7 +59,7 @@ def Sarima():
     predictions = pd.DataFrame(predictions)
     predictions.insert(0, 'Date', predictions.index)
     predictions.reset_index(drop=True, inplace=True)
-
+    
     # Lets Plot the data
     fig = go.Figure()
 
@@ -214,15 +214,6 @@ def LSTM_Model():
     valid = data[training_data_len:]
     valid['Predictions'] = predictions
 
-    # Visualize the data
-    fig = go.Figure()
-    fig.add_trace(go.Scatter(x=train['Date'], y=train[column], mode='lines', name='Train'))
-    fig.add_trace(go.Scatter(x=valid['Date'], y=valid[column], mode='lines', name='Validation'))
-    fig.add_trace(go.Scatter(x=valid['Date'], y=valid['Predictions'], mode='lines', name='Predictions'))
-
-    fig.update_layout(title='LSTM Model', xaxis_title='Date', yaxis_title='Price')
-    st.plotly_chart(fig, use_container_width=True, className='st-sc')
-
     current_date = datetime.date.today()
     future_date_range = pd.date_range(start=current_date, periods=days)
 
@@ -311,14 +302,6 @@ def RNN_Model():
     valid = data[training_data_len:]
     valid['Predictions'] = predictions
 
-    # Visualize the data
-    fig = go.Figure()
-    fig.add_trace(go.Scatter(x=train['Date'], y=train[column], mode='lines', name='Train'))
-    fig.add_trace(go.Scatter(x=valid['Date'], y=valid[column], mode='lines', name='Validation'))
-    fig.add_trace(go.Scatter(x=valid['Date'], y=valid['Predictions'], mode='lines', name='Predictions'))
-
-    fig.update_layout(title='RNN Model', xaxis_title='Date', yaxis_title='Price')
-    st.plotly_chart(fig, use_container_width=True, className='st-sc')
 
  # Get today's date and define the future date range for prediction
     current_date = datetime.date.today()
