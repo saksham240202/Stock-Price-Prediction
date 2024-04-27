@@ -214,8 +214,7 @@ def LSTM_Model():
     valid = data[training_data_len:]
     valid['Predictions'] = predictions
 
-    current_date = datetime.date.today()
-    future_date_range = pd.date_range(start=current_date, periods=days)
+    future_date_range = pd.date_range(start=end_date, periods=days)
 
     # Create the future data for prediction
     future_data = scaled_data[-60:]  # Use the last 60 days as input for prediction
@@ -230,7 +229,7 @@ def LSTM_Model():
     future_predictions = scaler.inverse_transform(np.array(future_predictions).reshape(-1, 1))
 
     # Prepare future dates for plotting
-    future_dates = pd.date_range(start=current_date + timedelta(days=1), periods=days)
+    future_dates = pd.date_range(start=end_date + timedelta(days=1), periods=days)
 
     # Plot the predictions
     fig = go.Figure()
@@ -304,8 +303,7 @@ def RNN_Model():
 
 
  # Get today's date and define the future date range for prediction
-    current_date = datetime.date.today()
-    future_date_range = pd.date_range(start=current_date, periods=days)
+    future_date_range = pd.date_range(start=end_date, periods=days)
 
     # Create the future data for prediction
     future_data = scaled_data[-60:]  # Use the last 60 days as input for prediction
@@ -320,7 +318,7 @@ def RNN_Model():
     future_predictions = scaler.inverse_transform(np.array(future_predictions).reshape(-1, 1))
 
     # Prepare future dates for plotting
-    future_dates = pd.date_range(start=current_date + timedelta(days=1), periods=days)
+    future_dates = pd.date_range(start=end_date + timedelta(days=1), periods=days)
 
     # Plot the predictions
     fig = go.Figure()
